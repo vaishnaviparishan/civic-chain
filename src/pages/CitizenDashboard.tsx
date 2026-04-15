@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield, FileText, Plus, LogOut, Clock, CheckCircle, XCircle, AlertTriangle, Verified } from "lucide-react";

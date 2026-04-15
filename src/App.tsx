@@ -10,6 +10,7 @@ import CitizenDashboard from "./pages/CitizenDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import GovernmentDashboard from "./pages/GovernmentDashboard";
 import ApplyForm from "./pages/ApplyForm";
+import VerifyPage from "./pages/VerifyPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/apply" element={<ProtectedRoute allowedRoles={["citizen"]}><ApplyForm /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/government" element={<ProtectedRoute allowedRoles={["government"]}><GovernmentDashboard /></ProtectedRoute>} />
+            <Route path="/verify" element={<VerifyPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
