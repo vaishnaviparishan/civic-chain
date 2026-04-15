@@ -1,11 +1,10 @@
 import CryptoJS from "crypto-js";
 
 export function generateCertificateHash(data: {
-  name: string;
-  certificateType: string;
+  userId: string;
   certificateId: string;
-  issueDate: string;
+  timestamp: string;
 }): string {
-  const payload = `${data.name}|${data.certificateType}|${data.certificateId}|${data.issueDate}`;
+  const payload = `${data.userId}|${data.certificateId}|${data.timestamp}`;
   return CryptoJS.SHA256(payload).toString();
 }

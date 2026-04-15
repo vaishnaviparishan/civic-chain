@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import StatusBadge from "@/components/StatusBadge";
-import { Shield, LogOut, CheckCircle, XCircle, AlertTriangle, Bot, Eye } from "lucide-react";
+import { Shield, LogOut, CheckCircle, XCircle, Bot, Eye } from "lucide-react";
 import { generateCertificateHash } from "@/lib/hash";
 
 interface Application {
@@ -69,10 +69,9 @@ export default function AdminDashboard() {
       const certId = `CERT-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       const issueDate = new Date().toISOString();
       const hash = generateCertificateHash({
-        name: app.full_name,
-        certificateType: app.certificate_type,
+        userId: app.user_id,
         certificateId: certId,
-        issueDate,
+        timestamp: issueDate,
       });
 
       await supabase.from("certificates").insert({
