@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import CitizenDashboard from "./pages/CitizenDashboard";
@@ -25,7 +26,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 
 function AuthRedirect() {
   const { user, role, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><div className="text-foreground">Loading...</div></div>;
   if (user) {
     if (role === "admin") return <Navigate to="/admin" />;
     if (role === "government") return <Navigate to="/government" />;
@@ -34,27 +35,31 @@ function AuthRedirect() {
   return <AuthPage />;
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthRedirect />} />
-            <Route path="/citizen" element={<ProtectedRoute allowedRoles={["citizen"]}><CitizenDashboard /></ProtectedRoute>} />
-            <Route path="/apply" element={<ProtectedRoute allowedRoles={["citizen"]}><ApplyForm /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/government" element={<ProtectedRoute allowedRoles={["government"]}><GovernmentDashboard /></ProtectedRoute>} />
-            <Route path="/verify" element={<VerifyPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ErrorBoundary>
+            <AuthProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<AuthRedirect />} />
+                <Route path="/citizen" element={<ProtectedRoute allowedRoles={["citizen"]}><CitizenDashboard /></ProtectedRoute>} />
+                <Route path="/apply" element={<ProtectedRoute allowedRoles={["citizen"]}><ApplyForm /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/government" element={<ProtectedRoute allowedRoles={["government"]}><GovernmentDashboard /></ProtectedRoute>} />
+                <Route path="/verify" element={<VerifyPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthProvider>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
