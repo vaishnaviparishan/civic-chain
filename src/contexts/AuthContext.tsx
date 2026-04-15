@@ -42,12 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     );
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       const u = session?.user ?? null;
       setUser(u);
-      if (u) fetchRole(u.id);
-      else setLoading(false);
-    });
+      if (u) {
+        await fetchRole(u.id);
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
     return () => subscription.unsubscribe();
   }, []);
 
