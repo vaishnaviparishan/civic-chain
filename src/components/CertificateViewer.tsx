@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { X, Download } from "lucide-react";
@@ -14,7 +15,30 @@ interface Certificate {
 }
 
 export default function CertificateViewer({ cert, onClose }: { cert: Certificate; onClose: () => void }) {
-  const qrData = JSON.stringify({ id: cert.certificate_id, hash: cert.hash });
+  const verifyUrl = `${window.location.origin}/verify?hash=${cert.hash}`;
+  const canDownload = cert.status === "temporary" || cert.status === "government_verified";
+
+  const handleDownload = () => {
+    if (!canDownload) return;
+    const content = `
+CERTIFICATE OF VERIFICATION
+============================
+Type: ${cert.certificate_type}
+Name: ${cert.holder_name}
+Certificate ID: ${cert.certificate_id}
+Issued: ${new Date(cert.issued_at).toLocaleDateString()}
+Status: ${cert.status === "government_verified" ? "Officially Verified" : "Temporarily Verified"}
+Hash: ${cert.hash}
+Verify at: ${verifyUrl}
+    `.trim();
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${cert.certificate_id}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -39,10 +63,16 @@ export default function CertificateViewer({ cert, onClose }: { cert: Certificate
           </div>
         </div>
 
-        <div className="flex justify-center mb-4">
+        <div className="flex flex-col items-center gap-4">
           <div className="bg-foreground p-3 rounded-lg">
-            <QRCodeSVG value={qrData} size={120} />
+            <QRCodeSVG value={verifyUrl} size={120} />
           </div>
+          <p className="text-xs text-muted-foreground">Scan to verify this certificate</p>
+          {canDownload && (
+            <Button variant="gradient" onClick={handleDownload}>
+              <Download className="h-4 w-4 mr-1" /> Download Certificate
+            </Button>
+          )}
         </div>
       </motion.div>
     </div>
